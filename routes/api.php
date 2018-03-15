@@ -15,14 +15,17 @@ use Illuminate\Http\Request;
 
 Route::post('login', 'AuthController@login');
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();    
+Route::get('authenticate', function () {
+    return response('Authentication successful', 200);
+})->middleware('auth:api');
+
+Route::middleware('auth:api')->group(function() {
+    Route::prefix('blogs')->group(function() {
+        Route::get('/{id}', 'BlogController@show')->where('id', '[0-9]+');
+        Route::post('/', 'BlogController@store');
+        Route::put('/{id}', 'BlogController@update')->where('id', '[0-9]+');
+        Route::delete('/{id}', 'BlogController@destroy')->where('id', '[0-9]+');
+    });
 });
 
-Route::prefix('blogs')->group(function() {
-    Route::get('/', 'BlogController@index');
-    Route::get('/{id}', 'BlogController@show')->where('id', '[0-9]+');
-    Route::post('/', 'BlogController@store');
-    Route::put('/{id}', 'BlogController@update')->where('id', '[0-9]+');
-    Route::delete('/{id}', 'BlogController@destroy')->where('id', '[0-9]+');
-});
+Route::get('blogs/', 'BlogController@index');
