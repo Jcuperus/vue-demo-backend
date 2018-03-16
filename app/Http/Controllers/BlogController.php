@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Blog;
 
 class BlogController extends Controller
@@ -14,8 +15,10 @@ class BlogController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->only(['title', 'author', 'content']);
-        $blog = Blog::create($data);
+        $user = Auth::user();
+        $data = $request->only(['title', 'content']);
+        $blog = $user->blogs()->create($data);
+        
         return $blog;
     }
 
@@ -28,10 +31,18 @@ class BlogController extends Controller
 
     public function update(Request $request, $id)
     {
-        $data = $request->only(['title', 'author', 'content']);
-        $blog = Blog::findOrFail($id);
-        $blog->update($data);
-        return $blog;
+        try {
+            $user = Auth::user();
+            $blog = Blog::where('user_id', $user->id)
+                ->findOrFail($id);
+    
+            $data = $request->only('title', 'content', 'user_id');
+            $blog->update($data);
+            return $blog;
+        }
+        catch (\Exception $e) {
+            return response('Blog not found', 400);
+        }
     }
 
     public function show($id)
