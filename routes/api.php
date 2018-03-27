@@ -15,9 +15,7 @@ use Illuminate\Http\Request;
 
 Route::post('login', 'AuthController@login');
 
-Route::get('authenticate', function () {
-    return response('Authentication successful', 200);
-})->middleware('auth:api');
+Route::get('authenticate', 'AuthController@authenticate')->middleware('auth:api');;
 
 Route::middleware('auth:api')->group(function() {
     Route::prefix('blogs')->group(function() {

@@ -16,9 +16,19 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
             $token = $user->createToken('userAuth');
-            
-            return $token;
+
+            return response()->json([
+                'accessToken' => $token->accessToken,
+                'user' => $user
+            ]);
+
+            return $token->accessToken;
         }
         return response('authentication failed', 401);
+    }
+
+    public function authenticate()
+    {
+        return Auth::user();
     }
 }

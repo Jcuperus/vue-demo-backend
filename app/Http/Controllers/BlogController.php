@@ -8,9 +8,11 @@ use App\Blog;
 
 class BlogController extends Controller
 {
+    const PAGINATION_LIMIT = 10; 
+
     public function index()
     {
-        return Blog::with('user')->latest()->get();
+        return Blog::with('user')->latest()->paginate(self::PAGINATION_LIMIT);
     }
 
     public function store(Request $request)
@@ -41,7 +43,7 @@ class BlogController extends Controller
             return $blog;
         }
         catch (\Exception $e) {
-            return response('Blog not found', 400);
+            return response('Blog not saved: ' . $e->getMessage(), 400);
         }
     }
 
